@@ -36,7 +36,7 @@ async function main() {
       const ownerAddress = cmd.ownerAddress ? cmd.ownerAddress : deployWallet.address;
       console.log(`Using owner address: ${ownerAddress}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
+      var gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
       console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
 
       let nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
@@ -51,18 +51,20 @@ async function main() {
       });
 
       // Create2 factory already deployed on the public networks, only deploy it on local node
-      console.log("--------------------Morty: process.env.CHAIN_ETH_NETWORK -----------------", process.env.CHAIN_ETH_NETWORK)
       // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
       // morty
-      if (true) {
+      if (cmd.onlyVerifier) {
+        gasPrice = await provider.getGasPrice();
         await deployer.deployCreate2Factory({ gasPrice, nonce });
         nonce++;
-
+        
+        gasPrice = await provider.getGasPrice();
         await deployer.deployMulticall3(create2Salt, { gasPrice, nonce });
         nonce++;
       }
 
       if (cmd.onlyVerifier) {
+        gasPrice = await provider.getGasPrice();
         await deployer.deployVerifier(create2Salt, { gasPrice, nonce });
         return;
       }
@@ -70,6 +72,7 @@ async function main() {
       // Deploy diamond upgrade init contract if needed
       const diamondUpgradeContractVersion = cmd.diamondUpgradeInit || 1;
       if (diamondUpgradeContractVersion) {
+        gasPrice = await provider.getGasPrice();
         await deployer.deployDiamondUpgradeInit(create2Salt, diamondUpgradeContractVersion, {
           gasPrice,
           nonce,
@@ -77,6 +80,7 @@ async function main() {
         nonce++;
       }
 
+      gasPrice = await provider.getGasPrice();
       await deployer.deployDefaultUpgrade(create2Salt, {
         gasPrice,
         nonce,
