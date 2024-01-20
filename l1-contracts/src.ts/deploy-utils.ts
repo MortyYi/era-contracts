@@ -23,7 +23,7 @@ export async function deployViaCreate2(
     }
   };
   log(`Deploying ${contractName}`);
-
+  console.log("-----------------------------Morty create2FactoryAddress:", create2FactoryAddress)
   const create2Factory = SingletonFactoryFactory.connect(create2FactoryAddress, deployWallet);
   const contractFactory = await hardhat.ethers.getContractFactory(contractName, {
     signer: deployWallet,

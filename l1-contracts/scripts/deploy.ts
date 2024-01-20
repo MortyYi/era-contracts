@@ -86,6 +86,7 @@ async function main() {
       await deployer.deployValidatorTimelock(create2Salt, { gasPrice });
     });
 
+  console.log("--------------------------------------Morty: process.argv", process.argv);
   await program.parseAsync(process.argv);
 }
 
