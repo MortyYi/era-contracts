@@ -50,6 +50,7 @@ async function main() {
       });
 
       // Create2 factory already deployed on the public networks, only deploy it on local node
+      console.log("--------------------Morty: process.env.CHAIN_ETH_NETWORK -----------------", process.env.CHAIN_ETH_NETWORK)
       if (process.env.CHAIN_ETH_NETWORK === "localhost") {
         await deployer.deployCreate2Factory({ gasPrice, nonce });
         nonce++;
