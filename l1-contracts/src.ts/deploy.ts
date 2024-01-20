@@ -248,6 +248,7 @@ export class Deployer {
 
   public async deployVerifier(create2Salt: string, ethTxOptions: ethers.providers.TransactionRequest) {
     ethTxOptions.gasLimit ??= 10_000_000;
+    console.log("---------------------------------------Morty: deployVerifier create2Salt---", create2Salt)
     const contractAddress = await this.deployViaCreate2("Verifier", [], create2Salt, ethTxOptions);
 
     if (this.verbose) {
