@@ -2,6 +2,9 @@ import * as hardhat from "hardhat";
 import "@nomiclabs/hardhat-ethers";
 import { ethers } from "ethers";
 import { SingletonFactoryFactory } from "../typechain";
+import { web3Provider } from "../scripts/utils";
+
+const provider = web3Provider();
 
 export async function deployViaCreate2(
   deployWallet: ethers.Wallet,
@@ -41,7 +44,7 @@ export async function deployViaCreate2(
     log(`Contract ${contractName} already deployed`);
     return [expectedAddress, ethers.constants.HashZero];
   }
-
+  ethTxOptions.gasPrice = (await provider.getGasPrice()).mul(120).div(100);
   const tx = await create2Factory.deploy(bytecode, create2Salt, ethTxOptions);
   const receipt = await tx.wait(2);
 

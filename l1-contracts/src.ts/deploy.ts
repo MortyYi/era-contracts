@@ -403,7 +403,6 @@ export class Deployer {
 
     // deploy zkSync contract
     // Morty
-    gasPrice = await provider.getGasPrice()
     const independentZkSyncDeployPromises = [
       this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
       this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
@@ -414,8 +413,6 @@ export class Deployer {
     await Promise.all(independentZkSyncDeployPromises);
     nonce += 5;
 
-    // Morty
-    gasPrice = await provider.getGasPrice()
     await this.deployDiamondProxy(create2Salt, { gasPrice, nonce });
   }
 

@@ -54,17 +54,16 @@ async function main() {
       // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
       // morty
       if (cmd.onlyVerifier) {
-        gasPrice = await provider.getGasPrice();
+        gasPrice = (await provider.getGasPrice()).mul(120).div(100);
         await deployer.deployCreate2Factory({ gasPrice, nonce });
         nonce++;
         
-        gasPrice = await provider.getGasPrice();
         await deployer.deployMulticall3(create2Salt, { gasPrice, nonce });
         nonce++;
       }
 
       if (cmd.onlyVerifier) {
-        gasPrice = await provider.getGasPrice();
+        gasPrice = (await provider.getGasPrice()).mul(120).div(100);
         await deployer.deployVerifier(create2Salt, { gasPrice, nonce });
         return;
       }
@@ -72,7 +71,6 @@ async function main() {
       // Deploy diamond upgrade init contract if needed
       const diamondUpgradeContractVersion = cmd.diamondUpgradeInit || 1;
       if (diamondUpgradeContractVersion) {
-        gasPrice = await provider.getGasPrice();
         await deployer.deployDiamondUpgradeInit(create2Salt, diamondUpgradeContractVersion, {
           gasPrice,
           nonce,
@@ -80,7 +78,6 @@ async function main() {
         nonce++;
       }
 
-      gasPrice = await provider.getGasPrice();
       await deployer.deployDefaultUpgrade(create2Salt, {
         gasPrice,
         nonce,
