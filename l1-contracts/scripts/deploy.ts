@@ -6,6 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { web3Provider } from "./utils";
 
+console.log("------------------------------Morty: process.env.ETH_CLIENT_WEB3_URL-------------------------", process.env.ETH_CLIENT_WEB3_URL)
 const provider = web3Provider();
 const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, "etc/test_config/constant");
 const ethTestConfig = JSON.parse(fs.readFileSync(`${testConfigPath}/eth.json`, { encoding: "utf-8" }));
