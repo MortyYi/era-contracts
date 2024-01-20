@@ -19,9 +19,12 @@ import {
   getNumberFromEnv,
   readBatchBootloaderBytecode,
   getTokens,
+  web3Provider,
 } from "../scripts/utils";
 import { deployViaCreate2 } from "./deploy-utils";
 import { IGovernanceFactory } from "../typechain/IGovernanceFactory";
+
+const provider = web3Provider();
 
 const L2_BOOTLOADER_BYTECODE_HASH = hexlify(hashL2Bytecode(readBatchBootloaderBytecode()));
 const L2_DEFAULT_ACCOUNT_BYTECODE_HASH = hexlify(hashL2Bytecode(readSystemContractsBytecode("DefaultAccount")));
@@ -399,6 +402,8 @@ export class Deployer {
     nonce = nonce ? parseInt(nonce) : await this.deployWallet.getTransactionCount();
 
     // deploy zkSync contract
+    // Morty
+    gasPrice = await provider.getGasPrice()
     const independentZkSyncDeployPromises = [
       this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
       this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
@@ -409,6 +414,8 @@ export class Deployer {
     await Promise.all(independentZkSyncDeployPromises);
     nonce += 5;
 
+    // Morty
+    gasPrice = await provider.getGasPrice()
     await this.deployDiamondProxy(create2Salt, { gasPrice, nonce });
   }
 
