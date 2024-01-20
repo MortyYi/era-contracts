@@ -27,9 +27,6 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
-      console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
-
       const nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
 
@@ -40,6 +37,7 @@ async function main() {
 
       const zkSync = deployer.zkSyncContract(deployWallet);
       const validatorTimelock = deployer.validatorTimelock(deployWallet);
+      var gasPrice = (await provider.getGasPrice()).mul(120).div(100);
       const tx = await zkSync.setValidator(validatorTimelock.address, true, {gasPrice: gasPrice});
       console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}`);
       const receipt = await tx.wait();

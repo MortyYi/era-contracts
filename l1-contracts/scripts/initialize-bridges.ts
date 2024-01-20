@@ -70,9 +70,6 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
-      console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
-
       const nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
 
@@ -131,18 +128,21 @@ async function main() {
       );
 
       // There will be two deployments done during the initial initialization
+      var gasPrice = (await provider.getGasPrice()).mul(120).div(100);
       const requiredValueToInitializeBridge = await zkSync.l2TransactionBaseCost(
         gasPrice,
         DEPLOY_L2_BRIDGE_COUNTERPART_GAS_LIMIT,
         REQUIRED_L2_GAS_PRICE_PER_PUBDATA
       );
 
+      gasPrice = (await provider.getGasPrice()).mul(120).div(100);
       const requiredValueToPublishBytecodes = await zkSync.l2TransactionBaseCost(
         gasPrice,
         priorityTxMaxGasLimit,
         REQUIRED_L2_GAS_PRICE_PER_PUBDATA
       );
-
+      
+      gasPrice = (await provider.getGasPrice()).mul(120).div(100);
       const independentInitialization = [
         zkSync.requestL2Transaction(
           ethers.constants.AddressZero,
