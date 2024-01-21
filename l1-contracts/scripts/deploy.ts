@@ -56,7 +56,6 @@ async function main() {
       // morty
       if (cmd.onlyVerifier) {
         gasPrice = await getGasPrice()
-        console.log("------------------Morty: gasPrice and nonce when deployCreate2Factory", gasPrice, nonce)
         await deployer.deployCreate2Factory({ gasPrice, nonce });
         nonce++;
         

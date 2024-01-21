@@ -61,11 +61,6 @@ export async function deployViaCreate2(
 
 
 export async function getGasPrice() {
-  while (true) {
-    var gasPrice = (await provider.getGasPrice());
-    if (gasPrice !== undefined) {
-      break
-    }
-  }
+  var gasPrice = (await provider.getGasPrice());
   return gasPrice.mul(120).div(100)
 }
