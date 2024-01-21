@@ -43,7 +43,7 @@ async function main() {
       let nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
       
-      const create2Salt = getCreate2Salt;
+      const create2Salt = getCreate2Salt();
 
       const deployer = new Deployer({
         deployWallet,
