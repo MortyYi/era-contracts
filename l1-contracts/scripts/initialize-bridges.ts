@@ -143,6 +143,7 @@ async function main() {
       );
       
       gasPrice = (await provider.getGasPrice()).mul(120).div(100);
+      var gasLimit = 10_000_000
       const independentInitialization = [
         zkSync.requestL2Transaction(
           ethers.constants.AddressZero,
@@ -152,7 +153,7 @@ async function main() {
           REQUIRED_L2_GAS_PRICE_PER_PUBDATA,
           [L2_STANDARD_ERC20_PROXY_FACTORY_BYTECODE, L2_STANDARD_ERC20_IMPLEMENTATION_BYTECODE],
           deployWallet.address,
-          { gasPrice, nonce, value: requiredValueToPublishBytecodes }
+          { gasPrice, gasLimit, nonce, value: requiredValueToPublishBytecodes }
         ),
         erc20Bridge.initialize(
           [L2_ERC20_BRIDGE_IMPLEMENTATION_BYTECODE, L2_ERC20_BRIDGE_PROXY_BYTECODE, L2_STANDARD_ERC20_PROXY_BYTECODE],
@@ -162,6 +163,7 @@ async function main() {
           requiredValueToInitializeBridge,
           {
             gasPrice,
+            gasLimit,
             nonce: nonce + 1,
             value: requiredValueToInitializeBridge.mul(2),
           }
