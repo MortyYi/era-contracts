@@ -5,6 +5,7 @@ import { formatUnits, parseUnits } from "ethers/lib/utils";
 import * as fs from "fs";
 import * as path from "path";
 import { web3Provider } from "./utils";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 console.log("------------------------------Morty: process.env.ETH_CLIENT_WEB3_URL-------------------------", process.env.ETH_CLIENT_WEB3_URL)
 const provider = web3Provider();
@@ -54,7 +55,7 @@ async function main() {
       // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
       // morty
       if (cmd.onlyVerifier) {
-        gasPrice = (await provider.getGasPrice()).mul(120).div(100);
+        gasPrice = await getGasPrice()
         await deployer.deployCreate2Factory({ gasPrice, nonce });
         nonce++;
         
