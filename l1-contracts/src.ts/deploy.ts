@@ -411,6 +411,7 @@ export class Deployer {
     //   this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
     // ];
     // await Promise.all(independentZkSyncDeployPromises);
+
     await this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
     await this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
     await this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
