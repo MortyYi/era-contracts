@@ -53,7 +53,8 @@ export async function deployViaCreate2(
 
   const deployedBytecodeAfter = await deployWallet.provider.getCode(expectedAddress);
   if (ethers.utils.hexDataLength(deployedBytecodeAfter) == 0) {
-    throw new Error("Failed to deploy bytecode via create2 factory");
+    console.log("expectedAddress:", expectedAddress)
+    throw new Error("Failed to deploy bytecode via create2 factory", );
   }
 
   return [expectedAddress, tx.hash];
