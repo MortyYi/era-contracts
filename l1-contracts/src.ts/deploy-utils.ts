@@ -3,7 +3,6 @@ import "@nomiclabs/hardhat-ethers";
 import { ethers } from "ethers";
 import { SingletonFactoryFactory } from "../typechain";
 import { web3Provider } from "../scripts/utils";
-import { Deployer } from "./deploy";
 
 const provider = web3Provider();
 
