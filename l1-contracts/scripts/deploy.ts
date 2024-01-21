@@ -5,7 +5,7 @@ import { formatUnits, parseUnits } from "ethers/lib/utils";
 import * as fs from "fs";
 import * as path from "path";
 import { web3Provider } from "./utils";
-import { getGasPrice } from "../src.ts/deploy-utils";
+import { getCreate2Salt, getGasPrice } from "../src.ts/deploy-utils";
 
 console.log("------------------------------Morty: process.env.ETH_CLIENT_WEB3_URL-------------------------", process.env.ETH_CLIENT_WEB3_URL)
 const provider = web3Provider();
@@ -42,8 +42,8 @@ async function main() {
       console.log(`Using nonce: ${cmd.nonce}`);
       let nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
-
-      const create2Salt = cmd.create2Salt ? cmd.create2Salt : ethers.utils.hexlify(ethers.utils.randomBytes(32));
+      
+      const create2Salt = getCreate2Salt;
 
       const deployer = new Deployer({
         deployWallet,
