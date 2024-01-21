@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { Wallet } from "ethers";
 import { Deployer } from "../src.ts/deploy";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { web3Provider } from "./utils";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -37,7 +37,7 @@ async function main() {
 
       const zkSync = deployer.zkSyncContract(deployWallet);
       const validatorTimelock = deployer.validatorTimelock(deployWallet);
-      var gasPrice = (await provider.getGasPrice()).mul(120).div(100);
+      var gasPrice = await getGasPrice()
       const tx = await zkSync.setValidator(validatorTimelock.address, true, {gasPrice: gasPrice});
       console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}`);
       const receipt = await tx.wait();

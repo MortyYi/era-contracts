@@ -10,6 +10,7 @@ import {
   REQUIRED_L2_GAS_PRICE_PER_PUBDATA,
   web3Provider,
 } from "./utils";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -128,22 +129,21 @@ async function main() {
       );
 
       // There will be two deployments done during the initial initialization
-      var gasPrice = (await provider.getGasPrice()).mul(120).div(100);
+      var gasPrice = await getGasPrice()
       const requiredValueToInitializeBridge = await zkSync.l2TransactionBaseCost(
         gasPrice,
         DEPLOY_L2_BRIDGE_COUNTERPART_GAS_LIMIT,
         REQUIRED_L2_GAS_PRICE_PER_PUBDATA
       );
 
-      gasPrice = (await provider.getGasPrice()).mul(120).div(100);
+      var gasPrice = await getGasPrice()
       const requiredValueToPublishBytecodes = await zkSync.l2TransactionBaseCost(
         gasPrice,
         priorityTxMaxGasLimit,
         REQUIRED_L2_GAS_PRICE_PER_PUBDATA
       );
       
-      gasPrice = (await provider.getGasPrice()).mul(120).div(100);
-      var gasLimit = 10_000_000
+      var gasPrice = await getGasPrice()
       const independentInitialization = [
         zkSync.requestL2Transaction(
           ethers.constants.AddressZero,
@@ -153,7 +153,7 @@ async function main() {
           REQUIRED_L2_GAS_PRICE_PER_PUBDATA,
           [L2_STANDARD_ERC20_PROXY_FACTORY_BYTECODE, L2_STANDARD_ERC20_IMPLEMENTATION_BYTECODE],
           deployWallet.address,
-          { gasPrice, gasLimit, nonce, value: requiredValueToPublishBytecodes }
+          { gasPrice, nonce, value: requiredValueToPublishBytecodes }
         ),
         erc20Bridge.initialize(
           [L2_ERC20_BRIDGE_IMPLEMENTATION_BYTECODE, L2_ERC20_BRIDGE_PROXY_BYTECODE, L2_STANDARD_ERC20_PROXY_BYTECODE],
@@ -163,7 +163,6 @@ async function main() {
           requiredValueToInitializeBridge,
           {
             gasPrice,
-            gasLimit,
             nonce: nonce + 1,
             value: requiredValueToInitializeBridge.mul(2),
           }

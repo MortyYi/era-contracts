@@ -403,14 +403,19 @@ export class Deployer {
 
     // deploy zkSync contract
     // Morty
-    const independentZkSyncDeployPromises = [
-      this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
-      this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
-      this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
-      this.deployGettersFacet(create2Salt, { gasPrice, nonce: nonce + 3 }),
-      this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
-    ];
-    await Promise.all(independentZkSyncDeployPromises);
+    // const independentZkSyncDeployPromises = [
+    //   this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
+    //   this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
+    //   this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
+    //   this.deployGettersFacet(create2Salt, { gasPrice, nonce: nonce + 3 }),
+    //   this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
+    // ];
+    // await Promise.all(independentZkSyncDeployPromises);
+    await this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
+    await this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
+    await this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
+    await this.deployGettersFacet(create2Salt, { gasPrice, nonce: nonce + 3 }),
+    await this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
     nonce += 5;
 
     await this.deployDiamondProxy(create2Salt, { gasPrice, nonce });
