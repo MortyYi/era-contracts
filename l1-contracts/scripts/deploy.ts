@@ -54,11 +54,12 @@ async function main() {
       // Create2 factory already deployed on the public networks, only deploy it on local node
       // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
       // morty
-      if (cmd.onlyVerifier) {
-        gasPrice = await getGasPrice()
-        await deployer.deployCreate2Factory({ gasPrice, nonce });
-        nonce++;
-        
+      if (process.env.CONTRACTS_CREATE2_FACTORY_ADDR == undefined) {
+          gasPrice = await getGasPrice()
+          await deployer.deployCreate2Factory({ gasPrice, nonce });
+          nonce++;
+      }
+      if (process.env.CONTRACTS_L1_MULTICALL3_ADDR == undefined) {
         await deployer.deployMulticall3(create2Salt, { gasPrice, nonce });
         nonce++;
       }
