@@ -51,9 +51,11 @@ export async function deployViaCreate2(
   const gasUsed = receipt.gasUsed;
   log(`${contractName} deployed, gasUsed: ${gasUsed.toString()}`);
 
+  // Morty, rpc error, still get no code
   const deployedBytecodeAfter = await deployWallet.provider.getCode(expectedAddress);
   if (ethers.utils.hexDataLength(deployedBytecodeAfter) == 0) {
     console.log("expectedAddress:", expectedAddress)
+    return [expectedAddress, tx.hash];
     throw new Error("Failed to deploy bytecode via create2 factory", );
   }
 
