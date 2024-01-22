@@ -28,6 +28,7 @@ export async function deployViaCreate2(
     }
   };
   log(`Deploying ${contractName}`);
+
   const create2Factory = SingletonFactoryFactory.connect(create2FactoryAddress, deployWallet);
   const contractFactory = await hardhat.ethers.getContractFactory(contractName, {
     signer: deployWallet,
@@ -49,6 +50,7 @@ export async function deployViaCreate2(
   // Not using gasprice and nonce parsed, to solve low gasprice and nonce error
   ethTxOptions.gasPrice = await getGasPrice()
   ethTxOptions.nonce = await deployWallet.getTransactionCount()
+  console.log(`Using nonce: ${ethTxOptions.nonce}`);
 
   const tx = await create2Factory.deploy(bytecode, create2Salt, ethTxOptions);
   const receipt = await tx.wait(2);

@@ -19,12 +19,9 @@ import {
   getNumberFromEnv,
   readBatchBootloaderBytecode,
   getTokens,
-  web3Provider,
 } from "../scripts/utils";
 import { deployViaCreate2 } from "./deploy-utils";
 import { IGovernanceFactory } from "../typechain/IGovernanceFactory";
-
-const provider = web3Provider();
 
 const L2_BOOTLOADER_BYTECODE_HASH = hexlify(hashL2Bytecode(readBatchBootloaderBytecode()));
 const L2_DEFAULT_ACCOUNT_BYTECODE_HASH = hexlify(hashL2Bytecode(readSystemContractsBytecode("DefaultAccount")));

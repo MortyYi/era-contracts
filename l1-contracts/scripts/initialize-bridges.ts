@@ -1,6 +1,5 @@
 import { Command } from "commander";
 import { ethers, Wallet } from "ethers";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { Deployer } from "../src.ts/deploy";
 import {
   applyL1ToL2Alias,

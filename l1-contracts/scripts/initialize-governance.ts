@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import { ethers, Wallet } from "ethers";
 import { Deployer } from "../src.ts/deploy";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { web3Provider } from "./utils";
 
 import * as fs from "fs";
@@ -30,9 +29,6 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      var gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
-      console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
-
       const ownerAddress = cmd.ownerAddress ? cmd.ownerAddress : deployWallet.address;
 
       const deployer = new Deployer({
@@ -52,7 +48,8 @@ async function main() {
         deployer.addresses.Bridges.WethBridgeProxy,
         deployWallet
       );
-      gasPrice = await getGasPrice()
+
+      var gasPrice = await getGasPrice()
       await (await erc20Bridge.changeAdmin(governance.address, {gasPrice})).wait();
       gasPrice = await getGasPrice()
       await (await wethBridge.changeAdmin(governance.address, {gasPrice})).wait();

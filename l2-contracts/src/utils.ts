@@ -86,7 +86,7 @@ export async function create2DeployFromL1(
   const deployerSystemContracts = new Interface(artifacts.readArtifactSync("IContractDeployer").abi);
   const bytecodeHash = hashL2Bytecode(bytecode);
   const calldata = deployerSystemContracts.encodeFunctionData("create2", [create2Salt, bytecodeHash, constructor]);
-  // gasPrice ??= await zkSync.provider.getGasPrice();
+
   gasPrice = await getGasPrice()
   const expectedCost = await zkSync.l2TransactionBaseCost(gasPrice, l2GasLimit, REQUIRED_L2_GAS_PRICE_PER_PUBDATA);
   gasPrice = await getGasPrice()
