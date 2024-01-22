@@ -6,6 +6,7 @@ import { applyL1ToL2Alias, getNumberFromEnv, REQUIRED_L2_GAS_PRICE_PER_PUBDATA, 
 
 import * as fs from "fs";
 import * as path from "path";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 const provider = web3Provider();
 const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, "etc/test_config/constant");
@@ -48,7 +49,7 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
+      var gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
       console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
 
       const nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
@@ -70,12 +71,14 @@ async function main() {
       const l2GovernorAddress = l1GovernorCodeSize == 0 ? l1GovernorAddress : applyL1ToL2Alias(l1GovernorAddress);
 
       // There will be two deployments done during the initial initialization
+      gasPrice = await getGasPrice()
       const requiredValueToInitializeBridge = await zkSync.l2TransactionBaseCost(
         gasPrice,
         DEPLOY_L2_BRIDGE_COUNTERPART_GAS_LIMIT,
         REQUIRED_L2_GAS_PRICE_PER_PUBDATA
       );
-
+      
+      gasPrice = await getGasPrice()
       const tx = await l1WethBridge.initialize(
         [L2_WETH_BRIDGE_IMPLEMENTATION_BYTECODE, L2_WETH_BRIDGE_PROXY_BYTECODE],
         l2WethAddress,
@@ -89,7 +92,7 @@ async function main() {
       );
       console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}. Waiting for receipt...`);
 
-      const receipt = await tx.wait();
+      const receipt = await tx.wait(2);
 
       console.log(`WETH bridge initialized, gasUsed: ${receipt.gasUsed.toString()}`);
       console.log(`CONTRACTS_L2_WETH_BRIDGE_ADDR=${await l1WethBridge.l2Bridge()}`);

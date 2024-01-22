@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { Wallet } from "ethers";
 import { Deployer } from "../src.ts/deploy";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { web3Provider } from "./utils";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -27,9 +27,6 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
-      console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
-
       const nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
 
@@ -40,7 +37,8 @@ async function main() {
 
       const zkSync = deployer.zkSyncContract(deployWallet);
       const validatorTimelock = deployer.validatorTimelock(deployWallet);
-      const tx = await zkSync.setValidator(validatorTimelock.address, true);
+      var gasPrice = await getGasPrice()
+      const tx = await zkSync.setValidator(validatorTimelock.address, true, {gasPrice: gasPrice});
       console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}`);
       const receipt = await tx.wait();
 

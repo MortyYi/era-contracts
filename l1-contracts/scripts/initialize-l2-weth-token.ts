@@ -6,6 +6,7 @@ import { getNumberFromEnv, getTokens, REQUIRED_L2_GAS_PRICE_PER_PUBDATA, web3Pro
 
 import * as fs from "fs";
 import * as path from "path";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 const provider = web3Provider();
 const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, "etc/test_config/constant");
@@ -137,7 +138,7 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
+      var gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
       console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
 
       const nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
@@ -149,6 +150,7 @@ async function main() {
       });
 
       const zkSync = deployer.zkSyncContract(deployWallet);
+      gasPrice = await getGasPrice()
       const requiredValueToInitializeBridge = await zkSync.l2TransactionBaseCost(
         gasPrice,
         DEPLOY_L2_BRIDGE_COUNTERPART_GAS_LIMIT,
@@ -156,6 +158,7 @@ async function main() {
       );
       const calldata = getL2Calldata(l2WethBridgeAddress, l1WethTokenAddress, l2WethTokenImplAddress);
 
+      gasPrice = await getGasPrice()
       const tx = await zkSync.requestL2Transaction(
         l2WethTokenProxyAddress,
         0,

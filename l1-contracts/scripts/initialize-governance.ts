@@ -6,6 +6,7 @@ import { web3Provider } from "./utils";
 
 import * as fs from "fs";
 import * as path from "path";
+import { getGasPrice } from "../src.ts/deploy-utils";
 
 const provider = web3Provider();
 const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, "etc/test_config/constant");
@@ -29,7 +30,7 @@ async function main() {
           ).connect(provider);
       console.log(`Using deployer wallet: ${deployWallet.address}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
+      var gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
       console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
 
       const ownerAddress = cmd.ownerAddress ? cmd.ownerAddress : deployWallet.address;
@@ -51,11 +52,12 @@ async function main() {
         deployer.addresses.Bridges.WethBridgeProxy,
         deployWallet
       );
-
-      await (await erc20Bridge.changeAdmin(governance.address)).wait();
-      await (await wethBridge.changeAdmin(governance.address)).wait();
-
-      await (await zkSync.setPendingGovernor(governance.address)).wait();
+      gasPrice = await getGasPrice()
+      await (await erc20Bridge.changeAdmin(governance.address, {gasPrice})).wait();
+      gasPrice = await getGasPrice()
+      await (await wethBridge.changeAdmin(governance.address, {gasPrice})).wait();
+      gasPrice = await getGasPrice()
+      await (await zkSync.setPendingGovernor(governance.address, {gasPrice})).wait();
 
       const call = {
         target: zkSync.address,
@@ -68,9 +70,10 @@ async function main() {
         predecessor: ethers.constants.HashZero,
         salt: ethers.constants.HashZero,
       };
-
-      await (await governance.scheduleTransparent(operation, 0)).wait();
-      await (await governance.execute(operation)).wait();
+      gasPrice = await getGasPrice()
+      await (await governance.scheduleTransparent(operation, 0, {gasPrice})).wait();
+      gasPrice = await getGasPrice()
+      await (await governance.execute(operation, {gasPrice})).wait();
     });
 
   await program.parseAsync(process.argv);

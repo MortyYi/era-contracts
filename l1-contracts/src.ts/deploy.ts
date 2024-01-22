@@ -19,9 +19,12 @@ import {
   getNumberFromEnv,
   readBatchBootloaderBytecode,
   getTokens,
+  web3Provider,
 } from "../scripts/utils";
 import { deployViaCreate2 } from "./deploy-utils";
 import { IGovernanceFactory } from "../typechain/IGovernanceFactory";
+
+const provider = web3Provider();
 
 const L2_BOOTLOADER_BYTECODE_HASH = hexlify(hashL2Bytecode(readBatchBootloaderBytecode()));
 const L2_DEFAULT_ACCOUNT_BYTECODE_HASH = hexlify(hashL2Bytecode(readSystemContractsBytecode("DefaultAccount")));
@@ -248,6 +251,7 @@ export class Deployer {
 
   public async deployVerifier(create2Salt: string, ethTxOptions: ethers.providers.TransactionRequest) {
     ethTxOptions.gasLimit ??= 10_000_000;
+    console.log("---------------------------------------Morty: deployVerifier create2Salt---", create2Salt)
     const contractAddress = await this.deployViaCreate2("Verifier", [], create2Salt, ethTxOptions);
 
     if (this.verbose) {
@@ -398,14 +402,21 @@ export class Deployer {
     nonce = nonce ? parseInt(nonce) : await this.deployWallet.getTransactionCount();
 
     // deploy zkSync contract
-    const independentZkSyncDeployPromises = [
-      this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
-      this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
-      this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
-      this.deployGettersFacet(create2Salt, { gasPrice, nonce: nonce + 3 }),
-      this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
-    ];
-    await Promise.all(independentZkSyncDeployPromises);
+    // Morty
+    // const independentZkSyncDeployPromises = [
+    //   this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
+    //   this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
+    //   this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
+    //   this.deployGettersFacet(create2Salt, { gasPrice, nonce: nonce + 3 }),
+    //   this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
+    // ];
+    // await Promise.all(independentZkSyncDeployPromises);
+
+    await this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
+    await this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
+    await this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
+    await this.deployGettersFacet(create2Salt, { gasPrice, nonce: nonce + 3 }),
+    await this.deployDiamondInit(create2Salt, { gasPrice, nonce: nonce + 4 }),
     nonce += 5;
 
     await this.deployDiamondProxy(create2Salt, { gasPrice, nonce });

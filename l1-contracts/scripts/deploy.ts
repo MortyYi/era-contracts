@@ -5,6 +5,7 @@ import { formatUnits, parseUnits } from "ethers/lib/utils";
 import * as fs from "fs";
 import * as path from "path";
 import { web3Provider } from "./utils";
+import { getCreate2Salt, getGasPrice } from "../src.ts/deploy-utils";
 
 const provider = web3Provider();
 const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, "etc/test_config/constant");
@@ -35,13 +36,12 @@ async function main() {
       const ownerAddress = cmd.ownerAddress ? cmd.ownerAddress : deployWallet.address;
       console.log(`Using owner address: ${ownerAddress}`);
 
-      const gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
-      console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
-
+      var gasPrice
+      console.log(`Using nonce: ${cmd.nonce}`);
       let nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
-
-      const create2Salt = cmd.create2Salt ? cmd.create2Salt : ethers.utils.hexlify(ethers.utils.randomBytes(32));
+      
+      const create2Salt = getCreate2Salt();
 
       const deployer = new Deployer({
         deployWallet,
@@ -50,15 +50,22 @@ async function main() {
       });
 
       // Create2 factory already deployed on the public networks, only deploy it on local node
-      if (process.env.CHAIN_ETH_NETWORK === "localhost") {
-        await deployer.deployCreate2Factory({ gasPrice, nonce });
-        nonce++;
+      // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
+      // morty
 
+      if (process.env.CONTRACTS_CREATE2_FACTORY_ADDR === ethers.constants.AddressZero) {
+          console.log("-------------------------------Morty: deploy create2 factory")
+          gasPrice = await getGasPrice()
+          await deployer.deployCreate2Factory({ gasPrice, nonce });
+          nonce++;
+      }
+      if (process.env.CONTRACTS_L1_MULTICALL3_ADDR === ethers.constants.AddressZero) {
         await deployer.deployMulticall3(create2Salt, { gasPrice, nonce });
         nonce++;
       }
 
       if (cmd.onlyVerifier) {
+        gasPrice = (await provider.getGasPrice()).mul(120).div(100);
         await deployer.deployVerifier(create2Salt, { gasPrice, nonce });
         return;
       }

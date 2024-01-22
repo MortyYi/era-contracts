@@ -9,6 +9,7 @@ import type { BigNumber, BytesLike, Wallet } from "ethers";
 import { ethers } from "ethers";
 import type { Provider } from "zksync-web3";
 import { REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, sleep } from "zksync-web3/build/src/utils";
+import { getGasPrice } from "../../l1-contracts/src.ts/deploy-utils";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const REQUIRED_L2_GAS_PRICE_PER_PUBDATA = require("../../SystemConfig.json").REQUIRED_L2_GAS_PRICE_PER_PUBDATA;
@@ -85,9 +86,10 @@ export async function create2DeployFromL1(
   const deployerSystemContracts = new Interface(artifacts.readArtifactSync("IContractDeployer").abi);
   const bytecodeHash = hashL2Bytecode(bytecode);
   const calldata = deployerSystemContracts.encodeFunctionData("create2", [create2Salt, bytecodeHash, constructor]);
-  gasPrice ??= await zkSync.provider.getGasPrice();
+  // gasPrice ??= await zkSync.provider.getGasPrice();
+  gasPrice = await getGasPrice()
   const expectedCost = await zkSync.l2TransactionBaseCost(gasPrice, l2GasLimit, REQUIRED_L2_GAS_PRICE_PER_PUBDATA);
-
+  gasPrice = await getGasPrice()
   return await zkSync.requestL2Transaction(
     DEPLOYER_SYSTEM_CONTRACT_ADDRESS,
     0,
