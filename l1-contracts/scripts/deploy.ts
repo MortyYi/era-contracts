@@ -52,10 +52,8 @@ async function main() {
       // Create2 factory already deployed on the public networks, only deploy it on local node
       // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
       // morty
-      console.log("start")
-      console.log("-------------------------------Morty: CONTRACTS_CREATE2_FACTORY_ADDR", process.env.CONTRACTS_CREATE2_FACTORY_ADDR)
-      console.log("stop")
-      if (process.env.CONTRACTS_CREATE2_FACTORY_ADDR === undefined) {
+
+      if (process.env.CONTRACTS_CREATE2_FACTORY_ADDR === ethers.constants.AddressZero) {
           console.log("-------------------------------Morty: deploy create2 factory")
           gasPrice = await getGasPrice()
           await deployer.deployCreate2Factory({ gasPrice, nonce });
