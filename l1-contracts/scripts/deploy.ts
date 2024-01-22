@@ -59,7 +59,7 @@ async function main() {
           await deployer.deployCreate2Factory({ gasPrice, nonce });
           nonce++;
       }
-      if (process.env.CONTRACTS_L1_MULTICALL3_ADDR === undefined) {
+      if (process.env.CONTRACTS_L1_MULTICALL3_ADDR === ethers.constants.AddressZero) {
         await deployer.deployMulticall3(create2Salt, { gasPrice, nonce });
         nonce++;
       }

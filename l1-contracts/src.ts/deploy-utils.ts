@@ -95,7 +95,7 @@ export function getCreate2Salt() {
     console.log("generate salt", salt)
     fs.writeFile(saltFile, salt, (err) => {
       if (err) {
-        console.error('Error writing to file:', err);
+        console.error('Error writing salt to salt file:', err);
       } else {
         console.log('salt has been save successfully.');
       }
