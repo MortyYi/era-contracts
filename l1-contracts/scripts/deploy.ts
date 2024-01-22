@@ -37,8 +37,7 @@ async function main() {
       const ownerAddress = cmd.ownerAddress ? cmd.ownerAddress : deployWallet.address;
       console.log(`Using owner address: ${ownerAddress}`);
 
-      var gasPrice = cmd.gasPrice ? parseUnits(cmd.gasPrice, "gwei") : await provider.getGasPrice();
-      console.log(`Using gas price: ${formatUnits(gasPrice, "gwei")} gwei`);
+      var gasPrice
       console.log(`Using nonce: ${cmd.nonce}`);
       let nonce = cmd.nonce ? parseInt(cmd.nonce) : await deployWallet.getTransactionCount();
       console.log(`Using nonce: ${nonce}`);
@@ -95,7 +94,6 @@ async function main() {
       await deployer.deployValidatorTimelock(create2Salt, { gasPrice });
     });
 
-  console.log("--------------------------------------Morty: process.argv", process.argv);
   await program.parseAsync(process.argv);
 }
 

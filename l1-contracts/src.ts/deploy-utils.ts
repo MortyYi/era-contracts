@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { SingletonFactoryFactory } from "../typechain";
 import { web3Provider } from "../scripts/utils";
 import * as fs from 'fs';
+import { formatUnits } from "ethers/lib/utils";
 
 const provider = web3Provider();
 
@@ -46,6 +47,7 @@ export async function deployViaCreate2(
     return [expectedAddress, ethers.constants.HashZero];
   }
   ethTxOptions.gasPrice = await getGasPrice()
+  ethTxOptions.nonce = await deployWallet.getTransactionCount()
   const tx = await create2Factory.deploy(bytecode, create2Salt, ethTxOptions);
   const receipt = await tx.wait(2);
 
@@ -74,7 +76,9 @@ export async function getGasPrice() {
   var gasPrice = (await provider.getGasPrice());
   const gasPriceMultiplier: string = process.env.GAS_PRICE_MULTIPLIER || '120';
   console.log("gas price multiplier:", gasPriceMultiplier)
-  return gasPrice.mul(gasPriceMultiplier).div(100)
+  const result = gasPrice.mul(gasPriceMultiplier).div(100)
+  console.log(`Using gas price: ${formatUnits(result, "gwei")} gwei`);
+  return result
 }
 
 export function getCreate2Salt() {
