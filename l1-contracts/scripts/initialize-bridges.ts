@@ -153,7 +153,7 @@ async function main() {
         deployWallet.address,
         { gasPrice, value: requiredValueToPublishBytecodes }
       )
-      tx1.wait(2)
+      await tx1.wait(2)
 
       gasPrice = await getGasPrice()
       const tx2 = await erc20Bridge.initialize(
@@ -167,7 +167,7 @@ async function main() {
           value: requiredValueToInitializeBridge.mul(2),
         }
       )
-      const receipt = tx2.wait(2)
+      const receipt = await tx2.wait(2)
 
       for (const tx of [tx1, tx2]) {
         console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}. Waiting for receipt...`);
