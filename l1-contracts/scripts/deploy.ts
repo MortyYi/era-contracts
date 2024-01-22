@@ -7,7 +7,6 @@ import * as path from "path";
 import { web3Provider } from "./utils";
 import { getCreate2Salt, getGasPrice } from "../src.ts/deploy-utils";
 
-console.log("------------------------------Morty: process.env.ETH_CLIENT_WEB3_URL-------------------------", process.env.ETH_CLIENT_WEB3_URL)
 const provider = web3Provider();
 const testConfigPath = path.join(process.env.ZKSYNC_HOME as string, "etc/test_config/constant");
 const ethTestConfig = JSON.parse(fs.readFileSync(`${testConfigPath}/eth.json`, { encoding: "utf-8" }));
@@ -53,7 +52,9 @@ async function main() {
       // Create2 factory already deployed on the public networks, only deploy it on local node
       // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
       // morty
+      console.log("start")
       console.log("-------------------------------Morty: CONTRACTS_CREATE2_FACTORY_ADDR", process.env.CONTRACTS_CREATE2_FACTORY_ADDR)
+      console.log("stop")
       if (process.env.CONTRACTS_CREATE2_FACTORY_ADDR === undefined) {
           console.log("-------------------------------Morty: deploy create2 factory")
           gasPrice = await getGasPrice()
