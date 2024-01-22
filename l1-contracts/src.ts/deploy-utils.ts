@@ -59,17 +59,16 @@ export async function deployViaCreate2(
   log(`${contractName} deployed, gasUsed: ${gasUsed.toString()}`);
 
   // Determinate if create2 contract deployment succeed
-  if (receipt.status != 1) {
-    console.log("Failed to deploy", contractName, "receipt status", receipt.status)
-    throw new Error("Failed to deploy bytecode via create2 factory", );
-  }
-
-  // infura rpc error, sometimes still get no code
-  // const deployedBytecodeAfter = await deployWallet.provider.getCode(expectedAddress);
-  // if (ethers.utils.hexDataLength(deployedBytecodeAfter) == 0) {
-  //   console.log("expectedAddress:", expectedAddress)
+  // if (receipt.status != 1) {
+  //   console.log("Failed to deploy", contractName, "receipt status", receipt.status)
   //   throw new Error("Failed to deploy bytecode via create2 factory", );
   // }
+
+  const deployedBytecodeAfter = await deployWallet.provider.getCode(expectedAddress);
+  if (ethers.utils.hexDataLength(deployedBytecodeAfter) == 0) {
+    console.log("expectedAddress:", expectedAddress)
+    throw new Error("Failed to deploy bytecode via create2 factory", );
+  }
 
   return [expectedAddress, tx.hash];
 }
