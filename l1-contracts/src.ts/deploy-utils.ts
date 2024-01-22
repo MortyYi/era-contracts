@@ -28,7 +28,6 @@ export async function deployViaCreate2(
     }
   };
   log(`Deploying ${contractName}`);
-  console.log("-----------------------------Morty create2FactoryAddress:", create2FactoryAddress)
   const create2Factory = SingletonFactoryFactory.connect(create2FactoryAddress, deployWallet);
   const contractFactory = await hardhat.ethers.getContractFactory(contractName, {
     signer: deployWallet,
@@ -46,27 +45,29 @@ export async function deployViaCreate2(
     log(`Contract ${contractName} already deployed`);
     return [expectedAddress, ethers.constants.HashZero];
   }
+
+  // Not using gasprice and nonce parsed, to solve low gasprice and nonce error
   ethTxOptions.gasPrice = await getGasPrice()
   ethTxOptions.nonce = await deployWallet.getTransactionCount()
+
   const tx = await create2Factory.deploy(bytecode, create2Salt, ethTxOptions);
   const receipt = await tx.wait(2);
 
   const gasUsed = receipt.gasUsed;
   log(`${contractName} deployed, gasUsed: ${gasUsed.toString()}`);
 
-  // Morty
+  // Determinate if create2 contract deployment succeed
   if (receipt.status != 1) {
     console.log("Failed to deploy", contractName, "receipt status", receipt.status)
     throw new Error("Failed to deploy bytecode via create2 factory", );
   }
 
-  // Morty, rpc error, still get no code
-  const deployedBytecodeAfter = await deployWallet.provider.getCode(expectedAddress);
-  if (ethers.utils.hexDataLength(deployedBytecodeAfter) == 0) {
-    console.log("expectedAddress:", expectedAddress)
-    return [expectedAddress, tx.hash];
-    throw new Error("Failed to deploy bytecode via create2 factory", );
-  }
+  // infura rpc error, sometimes still get no code
+  // const deployedBytecodeAfter = await deployWallet.provider.getCode(expectedAddress);
+  // if (ethers.utils.hexDataLength(deployedBytecodeAfter) == 0) {
+  //   console.log("expectedAddress:", expectedAddress)
+  //   throw new Error("Failed to deploy bytecode via create2 factory", );
+  // }
 
   return [expectedAddress, tx.hash];
 }
@@ -75,8 +76,8 @@ export async function deployViaCreate2(
 export async function getGasPrice() {
   var gasPrice = (await provider.getGasPrice());
   const gasPriceMultiplier: string = process.env.GAS_PRICE_MULTIPLIER || '120';
-  console.log("gas price multiplier:", gasPriceMultiplier)
   const result = gasPrice.mul(gasPriceMultiplier).div(100)
+  console.log("using gas price multiplier:", gasPriceMultiplier)
   console.log(`Using gas price: ${formatUnits(result, "gwei")} gwei`);
   return result
 }

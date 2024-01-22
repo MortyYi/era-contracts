@@ -49,16 +49,13 @@ async function main() {
         verbose: true,
       });
 
-      // Create2 factory already deployed on the public networks, only deploy it on local node
-      // if (process.env.CHAIN_ETH_NETWORK === "localhost") {
-      // morty
-
+      // Deploy create2 factory if not configed
       if (process.env.CONTRACTS_CREATE2_FACTORY_ADDR === ethers.constants.AddressZero) {
-          console.log("-------------------------------Morty: deploy create2 factory")
           gasPrice = await getGasPrice()
           await deployer.deployCreate2Factory({ gasPrice, nonce });
           nonce++;
       }
+      // Deploy multicall3 if not configed
       if (process.env.CONTRACTS_L1_MULTICALL3_ADDR === ethers.constants.AddressZero) {
         await deployer.deployMulticall3(create2Salt, { gasPrice, nonce });
         nonce++;

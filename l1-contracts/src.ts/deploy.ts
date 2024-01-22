@@ -251,7 +251,6 @@ export class Deployer {
 
   public async deployVerifier(create2Salt: string, ethTxOptions: ethers.providers.TransactionRequest) {
     ethTxOptions.gasLimit ??= 10_000_000;
-    console.log("---------------------------------------Morty: deployVerifier create2Salt---", create2Salt)
     const contractAddress = await this.deployViaCreate2("Verifier", [], create2Salt, ethTxOptions);
 
     if (this.verbose) {
@@ -402,7 +401,6 @@ export class Deployer {
     nonce = nonce ? parseInt(nonce) : await this.deployWallet.getTransactionCount();
 
     // deploy zkSync contract
-    // Morty
     // const independentZkSyncDeployPromises = [
     //   this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
     //   this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
@@ -412,6 +410,8 @@ export class Deployer {
     // ];
     // await Promise.all(independentZkSyncDeployPromises);
 
+    // Using synchronized deployment, to prevent nonce pending error when redeploy.
+    // All nonce parsed won't be used
     await this.deployMailboxFacet(create2Salt, { gasPrice, nonce }),
     await this.deployExecutorFacet(create2Salt, { gasPrice, nonce: nonce + 1 }),
     await this.deployAdminFacet(create2Salt, { gasPrice, nonce: nonce + 2 }),
