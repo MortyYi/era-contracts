@@ -166,7 +166,6 @@ async function main() {
         deployWallet.address,
         {
           gasPrice,
-          nonce,
           value: requiredValueToInitializeBridge,
         }
       );

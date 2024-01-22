@@ -423,14 +423,16 @@ export class Deployer {
     nonce = nonce ? parseInt(nonce) : await this.deployWallet.getTransactionCount();
 
     await this.deployERC20BridgeImplementation(create2Salt, { gasPrice, nonce: nonce });
-    await this.deployERC20BridgeProxy(create2Salt, { gasPrice, nonce: nonce + 1 });
+    nonce = await this.deployWallet.getTransactionCount();
+    await this.deployERC20BridgeProxy(create2Salt, { gasPrice, nonce: nonce });
   }
 
   public async deployWethBridgeContracts(create2Salt: string, gasPrice?: BigNumberish, nonce?) {
     nonce = nonce ? parseInt(nonce) : await this.deployWallet.getTransactionCount();
 
-    await this.deployWethBridgeImplementation(create2Salt, { gasPrice, nonce: nonce++ });
-    await this.deployWethBridgeProxy(create2Salt, { gasPrice, nonce: nonce++ });
+    await this.deployWethBridgeImplementation(create2Salt, { gasPrice, nonce: nonce });
+    nonce = await this.deployWallet.getTransactionCount();
+    await this.deployWethBridgeProxy(create2Salt, { gasPrice, nonce: nonce });
   }
 
   public async deployValidatorTimelock(create2Salt: string, ethTxOptions: ethers.providers.TransactionRequest) {
