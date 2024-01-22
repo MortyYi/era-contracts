@@ -153,6 +153,8 @@ async function main() {
         deployWallet.address,
         { gasPrice, value: requiredValueToPublishBytecodes }
       )
+      tx1.wait(2)
+
       gasPrice = await getGasPrice()
       const tx2 = await erc20Bridge.initialize(
         [L2_ERC20_BRIDGE_IMPLEMENTATION_BYTECODE, L2_ERC20_BRIDGE_PROXY_BYTECODE, L2_STANDARD_ERC20_PROXY_BYTECODE],
@@ -165,13 +167,13 @@ async function main() {
           value: requiredValueToInitializeBridge.mul(2),
         }
       )
+      const receipt = tx2.wait(2)
 
       for (const tx of [tx1, tx2]) {
         console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}. Waiting for receipt...`);
       }
-      const receipts = await Promise.all([tx1, tx2].map((tx) => tx.wait(2)));
 
-      console.log(`ERC20 bridge initialized, gasUsed: ${receipts[1].gasUsed.toString()}`);
+      console.log(`ERC20 bridge initialized, gasUsed: ${receipt.gasUsed.toString()}`);
       console.log(`CONTRACTS_L2_ERC20_BRIDGE_ADDR=${await erc20Bridge.l2Bridge()}`);
     });
 
