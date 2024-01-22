@@ -144,36 +144,33 @@ async function main() {
       );
       
       var gasPrice = await getGasPrice()
-      const independentInitialization = [
-        zkSync.requestL2Transaction(
-          ethers.constants.AddressZero,
-          0,
-          "0x",
-          priorityTxMaxGasLimit,
-          REQUIRED_L2_GAS_PRICE_PER_PUBDATA,
-          [L2_STANDARD_ERC20_PROXY_FACTORY_BYTECODE, L2_STANDARD_ERC20_IMPLEMENTATION_BYTECODE],
-          deployWallet.address,
-          { gasPrice, nonce, value: requiredValueToPublishBytecodes }
-        ),
-        erc20Bridge.initialize(
-          [L2_ERC20_BRIDGE_IMPLEMENTATION_BYTECODE, L2_ERC20_BRIDGE_PROXY_BYTECODE, L2_STANDARD_ERC20_PROXY_BYTECODE],
-          l2TokenFactoryAddr,
-          l2GovernorAddress,
-          requiredValueToInitializeBridge,
-          requiredValueToInitializeBridge,
-          {
-            gasPrice,
-            nonce: nonce + 1,
-            value: requiredValueToInitializeBridge.mul(2),
-          }
-        ),
-      ];
+      const tx1 = await zkSync.requestL2Transaction(
+        ethers.constants.AddressZero,
+        0,
+        "0x",
+        priorityTxMaxGasLimit,
+        REQUIRED_L2_GAS_PRICE_PER_PUBDATA,
+        [L2_STANDARD_ERC20_PROXY_FACTORY_BYTECODE, L2_STANDARD_ERC20_IMPLEMENTATION_BYTECODE],
+        deployWallet.address,
+        { gasPrice, value: requiredValueToPublishBytecodes }
+      )
+      gasPrice = await getGasPrice()
+      const tx2 = await erc20Bridge.initialize(
+        [L2_ERC20_BRIDGE_IMPLEMENTATION_BYTECODE, L2_ERC20_BRIDGE_PROXY_BYTECODE, L2_STANDARD_ERC20_PROXY_BYTECODE],
+        l2TokenFactoryAddr,
+        l2GovernorAddress,
+        requiredValueToInitializeBridge,
+        requiredValueToInitializeBridge,
+        {
+          gasPrice,
+          value: requiredValueToInitializeBridge.mul(2),
+        }
+      )
 
-      const txs = await Promise.all(independentInitialization);
-      for (const tx of txs) {
+      for (const tx of [tx1, tx2]) {
         console.log(`Transaction sent with hash ${tx.hash} and nonce ${tx.nonce}. Waiting for receipt...`);
       }
-      const receipts = await Promise.all(txs.map((tx) => tx.wait(2)));
+      const receipts = await Promise.all([tx1, tx2].map((tx) => tx.wait(2)));
 
       console.log(`ERC20 bridge initialized, gasUsed: ${receipts[1].gasUsed.toString()}`);
       console.log(`CONTRACTS_L2_ERC20_BRIDGE_ADDR=${await erc20Bridge.l2Bridge()}`);
