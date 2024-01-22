@@ -73,6 +73,7 @@ export async function deployViaCreate2(
 export async function getGasPrice() {
   var gasPrice = (await provider.getGasPrice());
   const gasPriceMultiplier: string = process.env.GAS_PRICE_MULTIPLIER || '120';
+  console.log("gas price multiplier:", gasPriceMultiplier)
   return gasPrice.mul(gasPriceMultiplier).div(100)
 }
 
